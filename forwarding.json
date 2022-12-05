@@ -1,0 +1,13 @@
+{
+  "urls": [
+    {
+      "if": "http://localhost:3002/api/sqlite",
+      "then": "http://localhost:3003/api/sqlite"
+    },
+    {
+      "if": "http://localhost:3002",
+      "then": "http://localhost:3001"
+    }
+  ]
+}
+
