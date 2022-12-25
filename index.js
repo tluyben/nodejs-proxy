@@ -55,6 +55,7 @@ app.all('*', (req, res) => {
     options.body = body;
   }
 
+
   // make the request to the other host
   request(options, (error, response, body) => {
     if (error) {
@@ -68,7 +69,7 @@ app.all('*', (req, res) => {
 });
 
 
-app.listen(process.env.PORT ?? 3002, () => {
-  console.log(`Server listening on port ${process.env.PORT ?? 3002}`);
+app.listen(process.env.NODE_PROXY_PORT ?? 3002, () => {
+  console.log(`Server listening on port ${process.env.NODE_PROXY_PORT ?? 3002}`);
 });
 
