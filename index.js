@@ -7,8 +7,17 @@ const dotenv = require('dotenv'); // add the dotenv module for reading environme
 // load the values of the environment variables from the .env file
 dotenv.config();
 
-// read the forwarding.json file
-const config = JSON.parse(fs.readFileSync('forwarding.json', 'utf8'));
+let config = undefined
+
+// if there is an -f as first argument, read the config file from the path specified by the second argument
+if (process.argv[2] === '-f') {
+  // read the config file
+  config = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+} else {
+  // read the forwarding.json file
+  config = JSON.parse(fs.readFileSync('forwarding.json', 'utf8'));
+}
+
 
 // create an express app
 const app = express();
