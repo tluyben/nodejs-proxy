@@ -1,8 +1,9 @@
-const express = require('express');
-const request = require('request');
-const fs = require('fs'); // add the fs module for reading the config file
-const url = require('url'); // add the url module for parsing URLs
-const dotenv = require('dotenv'); // add the dotenv module for reading environment variables
+import express from 'express';
+import fs from 'fs'; // add the fs module for reading the config file
+import url from 'url'; // add the url module for parsing URLs
+import dotenv from 'dotenv'; // add the dotenv module for reading environment variables
+
+import got from 'got'
 
 // load the values of the environment variables from the .env file
 dotenv.config();
@@ -18,16 +19,20 @@ if (process.argv[2] === '-f') {
   config = JSON.parse(fs.readFileSync('forwarding.json', 'utf8'));
 }
 
-
 // create an express app
 const app = express();
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 // set up a route that accepts any method and any path
-app.all('*', (req, res) => {
+app.all('*', async (req, res) => {
   // get the original request method, path, and body
   const method = req.method;
   const path = req.path;
   const body = req.body;
+
+  //console.log(req)
 
   // get the query string parameters
   const query = req.query;
@@ -50,31 +55,40 @@ app.all('*', (req, res) => {
   // deconstruct the mapping 
   const urlMapping = url.parse(mapping.then);
 
+  //console.log(config.urls, 'urlObj', urlObj, 'mapping', mapping, 'urlMapping', urlMapping)
+
+  // here we cut out the path if the 'if' path is longer than then 'then' path 
+  let endPath = mapping ? mapping.then + (mapping.then.indexOf('/', 10) >= 0 ? '' : '/') + urlObj.path.substring(urlMapping.path.length) : urlMapping.path
+
+  const splitPath = urlObj.path.substring(1).split('/')
+
+  for (let i = 0; i < urlMapping.path.substring(1).split('/').length; i++) {
+    endPath = endPath.replace(`/${splitPath[i]}`, '')
+  }
+
   // construct the options object for the request module
   const options = {
-    url: mapping ? mapping.then + (mapping.then.indexOf('/', 10) >= 0 ? '' : '/') + urlObj.path.substring(urlMapping.path.length) : urlObj.href, // the URL to forward the request to
+    url: endPath, // the URL to forward the request to
     method, // the original request method
     headers, // the original request headers
-    qs: query, // the query string parameters
-    json: true, // set the content type to JSON
+    searchParams: query
   };
 
   // add the request body if the original request had one
+  // fix for non-json bodies
   if (body) {
-    options.body = body;
+    options.json = body;
   }
 
+  options.headers.host = urlMapping.host
 
-  // make the request to the other host
-  request(options, (error, response, body) => {
-    if (error) {
-      // handle the error
-      res.status(500).send({ error });
-    } else {
-      // send the response from the other host back to the original requester
-      res.send(body);
-    }
-  });
+  delete options['url']
+  delete options['headers']['content-length']
+
+  const data = await got(endPath, options).json();
+
+  res.send(data)
+  //console.log(data)
 });
 
 
