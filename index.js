@@ -14,9 +14,11 @@ let config = undefined
 if (process.argv[2] === '-f') {
   // read the config file
   config = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+  console.log(`Reading configuration forwarding file ${process.argv[3]}`);
 } else {
   // read the forwarding.json file
   config = JSON.parse(fs.readFileSync('forwarding.json', 'utf8'));
+  console.log(`Reading configuration forwarding file ./forwarding.json`);
 }
 
 // create an express app

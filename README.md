@@ -7,8 +7,12 @@
 
 - yarn start
   - for production 
+
 - yarn dev 
   - for development
+
+- yarn dev -- -f ./forwardingfile.json 
+  - for passing in the forwarding file 
 
 - yarn start -- -f ./forwardingfile.json 
   - for passing in the forwarding file 
