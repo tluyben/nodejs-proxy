@@ -65,6 +65,8 @@ app.all('*', async (req, res) => {
   const splitPath = urlObj.path.substring(1).split('/')
 
   for (let i = 0; i < urlMapping.path.substring(1).split('/').length; i++) {
+    // continue if split path is empty (it would be a trailing /)
+    if (splitPath.trim().length === 0) continue
     endPath = endPath.replace(`/${splitPath[i]}`, '')
   }
 
