@@ -4,7 +4,17 @@
 
 - install node 17+, npm/yarn
 - run yarn
+
 - yarn start
+  - for production 
+- yarn dev 
+  - for development
+
+- yarn start -- -f ./forwardingfile.json 
+  - for passing in the forwarding file 
+
+
+
 
 ## how to use
 
